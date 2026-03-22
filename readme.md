@@ -59,12 +59,12 @@ CREATE TABLE users ( id INTEGER PRIMARY KEY, username TEXT );
 }
 ```
 
-🛡️ กลไกการแก้ปัญหาที่สำคัญ (Key Solutions)
+## 🛡️ กลไกการแก้ปัญหาที่สำคัญ (Key Solutions)
 Message Order: ใช้ Timestamp และ Sequence Number จากฝั่ง Server ป้องกันปัญหาเวลาเครื่อง Client ไม่ตรงกัน
 
 Delivery Guarantee: ใช้ระบบ Acknowledge (ACK) ร่วมกับ Idempotency Key ป้องกันข้อความเบิ้ลเวลาเน็ตหลุด
 
 Chat History Tiering: เก็บข้อมูลใหม่ใน MongoDB และย้ายข้อมูลเก่า (6 เดือน+) ไปอัดไฟล์ Zip ลง AWS S3 เพื่อประหยัดงบและรักษาความเร็ว Database
 
-
-จัดทำโดย: กลุ่ม [5] | รายวิชา ENGSE207 | มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา | พ.ศ. 2568
+---
+*จัดทำโดย: กลุ่ม [5] | รายวิชา ENGSE207 | มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา | พ.ศ. 2568
