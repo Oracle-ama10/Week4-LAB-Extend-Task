@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  title: Task Board - Chat Service API (Lab 4 Add-on)
+  description: |
+    API Documentation สำหรับ Chat Service Microservice 
+    
+    ### 🔌 WebSocket Events (Real-time Communication)
+    เนื่องจาก OpenAPI 3.0 ออกแบบมาสำหรับ REST API จึงขออธิบาย WebSocket Events ของ Socket.io ไว้ดังนี้:
+    
+    * **`join_room`** (Client -> Server): ส่ง `{ "boardId": 1 }` เพื่อเข้าห้องแชท
+    * **`leave_room`** (Client -> Server): ส่ง `{ "boardId": 1 }` เพื่อออกจากห้องแชท
+    * **`send_message`** (Client -> Server): ส่ง `{ "boardId": 1, "type": "text", "content": "สวัสดีทีม" }`
+    * **`message_received`** (Server -> Client): รับ Payload `{ "_id": "...", "senderId": 2, "content": "สวัสดีทีม" }`
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development Server
+paths:
+  /api/boards/{boardId}/messages:
+    get:
+      summary: ดึงประวัติการแชทของ Board (Chat History)
+      description: ดึงข้อมูลข้อความย้อนหลังในห้องแชท รองรับ Pagination
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+          description: ID ของ Task Board (อ้างอิงจาก SQLite)
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: จำนวนข้อความที่ต้องการดึง (Pagination)
+        - in: query
+          name: before
+          schema:
+            type: string
+            format: date-time
+          description: ดึงข้อความที่เก่ากว่า Timestamp นี้
+      responses:
+        '200':
+          description: ดึงข้อมูลสำเร็จ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+    post:
+      summary: ส่งข้อความใหม่ (REST Fallback)
+      description: API สำหรับส่งข้อความ (ใช้กรณี WebSocket มีปัญหา หรือให้ System เรียกใช้)
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+          description: ID ของ Task Board
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - content
+              properties:
+                type:
+                  type: string
+                  enum: [text, file]
+                  description: ประเภทของข้อความ (ข้อความธรรมดา หรือ รูปภาพ/ไฟล์)
+                content:
+                  type: string
+                  description: เนื้อหาข้อความ หรือ URL ของไฟล์ใน AWS S3
+      responses:
+        '201':
+          description: สร้างข้อความสำเร็จ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: ข้อมูลไม่ถูกต้อง (Validation Error)
+
+  /api/boards/{boardId}/messages/{messageId}:
+    get:
+      summary: ดึงรายละเอียดข้อความเฉพาะเจาะจง
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: messageId
+          required: true
+          schema:
+            type: string
+          description: Object ID ของข้อความใน MongoDB
+      responses:
+        '200':
+          description: คืนค่าข้อมูลข้อความ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: ไม่พบข้อความนี้
+    delete:
+      summary: ลบข้อความ (Soft Delete)
+      description: เปลี่ยนสถานะข้อความเป็น "DELETED" โดยไม่ลบออกจาก Database จริงๆ
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: messageId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ลบข้อความสำเร็จ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "ข้อความถูกลบแล้ว"
+
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "60d5ec49f1b2c8b1f8e4e1a1"
+          description: MongoDB ObjectId
+        boardId:
+          type: integer
+          example: 1
+          description: ID ของ Board (อ้างอิง Task Service SQLite)
+        senderId:
+          type: integer
+          example: 42
+          description: ID ของผู้ส่ง (อ้างอิง User Service / Task Service)
+        type:
+          type: string
+          enum: [text, file]
+          example: "text"
+        content:
+          type: string
+          example: "พรุ่งนี้มีประชุมอัปเดตงานนะทีม!"
+        status:
+          type: string
+          enum: [ACTIVE, DELETED]
+          example: "ACTIVE"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-03-23T10:00:00Z"
