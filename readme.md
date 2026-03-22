@@ -25,11 +25,12 @@
 
 ```
 week4_homework_Group[ใส่เลขกลุ่มของคุณ]/
- ┣ 📜 README.md                 📍 สรุปภาพรวมของโปรเจกต์ (คุณอยู่ที่นี่)
- ┣ 🖼️ architecture_diagram.png  📍 แผนภาพสถาปัตยกรรมระบบโดยรวม (C4/Container Level)
+ ┣ 📜 README.md                 📍 สรุปภาพรวมของโปรเจกต์
+ ┣ 🖼️ architecture_diagram.png  📍 แผนภาพสถาปัตยกรรมระบบโดยรวม
  ┣ 🖼️ event_flow_diagram.png    📍 แผนภาพ Sequence แสดงการทำงานของ Events
- ┣ 📄 service_design.pdf        📍 เอกสารตอบคำถามข้อ 1-3 และแนวทางแก้ปัญหา (Challenges) ข้อ 5
- ┗ 📄 api_design.yaml           📍 เอกสาร API Specification (OpenAPI 3.0) ครอบคลุม REST และ WS
+ ┣ 📄 service_design.pdf        📍 เอกสาร Service Design (ตอบคำถาม)
+ ┣ 📄 api_design.yaml           📍 เอกสาร API Specification (OpenAPI 3.0) 
+ ┗ 📄 challenges_solutions.pdf  📍 เอกสารวิเคราะห์ปัญหาและทางแก้ (Challenges 4 ข้อ)
 ```
 
 
